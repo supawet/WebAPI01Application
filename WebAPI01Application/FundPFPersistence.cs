@@ -107,7 +107,7 @@ namespace WebAPI01Application
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@dt", dt);
 
-                double? double_null;
+                //double? double_null;
                 //string<T>? string_null = null;
 
                 mySQLReader = cmd.ExecuteReader();
