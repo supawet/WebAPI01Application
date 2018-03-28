@@ -11,8 +11,8 @@ namespace WebAPI01Application.MessageHandlers
 {
     public class APIKeyMessageHandler : DelegatingHandler
     {
-        // "161ACJPBNK4876531" for siam square and "545RGJKD12QAC974" for BLA
-        private string[] APIKeyToCheck = { "161ACJPBNK4876531", "545RGJKD12QAC974" };
+        // "161ACJPBNK4876531" for siam square and "545RGJKD12QAC974" for BLA , "256DVH4789EAXZQ6" for Banpod
+        private string[] APIKeyToCheck = { "161ACJPBNK4876531", "545RGJKD12QAC974" , "256DVH4789EAXZQ6" };
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage httpRequestMessage, CancellationToken cancellationToken)
         {
