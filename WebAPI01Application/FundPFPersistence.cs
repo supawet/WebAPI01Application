@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+
+using System.Data;
+using System.Data.OleDb;
+using System.Data.SqlClient;
+
 using System.Collections;
 using MySql.Data;
 using MySql.Data.MySqlClient;
@@ -89,17 +94,32 @@ namespace WebAPI01Application
  
         public ArrayList getFundPFDate(string dt)
         {
+            /*
             MySql.Data.MySqlClient.MySqlConnection conn;
             string myConnectionString = ConfigurationManager.ConnectionStrings["localDB"].ConnectionString;
             conn = new MySql.Data.MySqlClient.MySqlConnection();
+            */
+            OleDbConnection conn = null;
+            OleDbCommand command = null;
+            OleDbDataReader mySQLReader = null;
             try
             {
+                /*
                 conn.ConnectionString = myConnectionString;
                 conn.Open();
+                */
+                string myConnectionString = ConfigurationManager.ConnectionStrings["localDB"].ConnectionString; ;
+                conn = new OleDbConnection(myConnectionString);
+
+                conn.Open();
+
+                command = new OleDbCommand();
+                command.Connection = conn;
+                command.CommandTimeout = 0;
 
                 ArrayList fundPFArray = new ArrayList();
 
-                MySql.Data.MySqlClient.MySqlDataReader mySQLReader = null;
+                /*MySql.Data.MySqlClient.MySqlDataReader mySQLReader = null;
 
                 //string sqlString = "select * from bblamapidb.azure_dividend where id=1";// tran_date = '" + dt + "'";
                 string sqlString = "SP_FundPF";
@@ -111,13 +131,20 @@ namespace WebAPI01Application
                 //string<T>? string_null = null;
 
                 mySQLReader = cmd.ExecuteReader();
+                */
+                command.CommandType = CommandType.StoredProcedure;
+                command.CommandText = "SP_FundPF";
+                command.Parameters.Clear();
+                command.Parameters.AddWithValue("@dt", dt);
+                mySQLReader = command.ExecuteReader();
+
                 while (mySQLReader.Read())
                 {
                     FundPF fpf = new FundPF();
                     //n.Id = mySQLReader.GetInt32(mySQLReader.GetOrdinal("Id"));
                     fpf.FUND_KIND = mySQLReader.GetValue(mySQLReader.GetOrdinal("FUND KIND")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("FUND KIND"));
                     fpf.FUND_TYPE = mySQLReader.GetValue(mySQLReader.GetOrdinal("FUND TYPE")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("FUND TYPE"));
-                    fpf.PORT_CODE = mySQLReader.GetValue(mySQLReader.GetOrdinal("PORT_CODE")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("PORT_CODE"));
+                    fpf.PORT_CODE = mySQLReader.GetValue(mySQLReader.GetOrdinal("PORTCODE")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("PORTCODE"));
                     fpf.AMC_CODE = mySQLReader.GetValue(mySQLReader.GetOrdinal("AMC CODE")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("AMC CODE"));
                     fpf.AMC_NAME = mySQLReader.GetValue(mySQLReader.GetOrdinal("AMC NAME")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("AMC NAME"));
                     fpf.FUND_NAME_TH = mySQLReader.GetValue(mySQLReader.GetOrdinal("FUND NAME TH")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("FUND NAME TH"));
@@ -133,7 +160,7 @@ namespace WebAPI01Application
                     fpf.MINIMUM_NEXT_ORDER = mySQLReader.GetValue(mySQLReader.GetOrdinal("MINIMUM NEXT ORDER")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("MINIMUM NEXT ORDER"));
                     fpf.MANAGEMENT_FEE = mySQLReader.GetValue(mySQLReader.GetOrdinal("MANAGEMENT FEE")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("MANAGEMENT FEE"));
                     fpf.INCEPTION_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("INCEPTION DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
-                    fpf.RISK = mySQLReader.GetValue(mySQLReader.GetOrdinal("RISK")).Equals(DBNull.Value) ? null : (Int32?)mySQLReader.GetInt32(mySQLReader.GetOrdinal("RISK"));
+                    fpf.RISK = mySQLReader.GetValue(mySQLReader.GetOrdinal("RISK")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RISK"));
                     fpf.RETURN_1D = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1D")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RETURN_1D"));
                     fpf.RETURN_1M = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1M")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RETURN_1M"));
                     fpf.RETURN_3M = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_3M")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RETURN_3M"));
@@ -198,6 +225,8 @@ namespace WebAPI01Application
                     fpf.NAV_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("NAV DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("NAV DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
                     fundPFArray.Add(fpf);
                 }
+                mySQLReader.Close();
+
                 return fundPFArray;
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -206,7 +235,14 @@ namespace WebAPI01Application
             }
             finally
             {
-                conn.Close();
+                if (mySQLReader != null)
+                {
+                    mySQLReader.Close();
+                }
+                if (conn != null)
+                {
+                    conn.Close();
+                }
             }
         }
     }

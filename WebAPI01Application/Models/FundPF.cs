@@ -26,7 +26,7 @@ namespace WebAPI01Application.Models
         public double? MINIMUM_NEXT_ORDER { get; set; }
         public double? MANAGEMENT_FEE { get; set; }
         public string INCEPTION_DATE { get; set; }
-        public int? RISK { get; set; }
+        public double? RISK { get; set; }
         public double? RETURN_1D { get; set; }
         public double? RETURN_1M { get; set; }
         public double? RETURN_3M { get; set; }
