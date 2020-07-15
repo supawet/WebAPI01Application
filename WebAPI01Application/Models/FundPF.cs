@@ -89,5 +89,37 @@ namespace WebAPI01Application.Models
         public double? BENCHMARK_SD2_5Y { get; set; }
         public double? BENCHMARK_SD2_INC { get; set; }
         public string NAV_DATE { get; set; }
+        public string Fund_Fact_Sheet { get; set; }
+        public string Monthly_Fund_Update { get; set; }
+        public ASSET_ALLOCATION ASSET_ALLOCATION { get; set; }
+        public TOP5HOLDINGS TOP5HOLDINGS { get; set; }
+    }
+
+    public class ASSET_ALLOCATION
+    {
+        public string ASSET_ALLOCATION_DATE { get; set; }
+        public string PORT_CODE { get; set; }
+        public List<ASSET_ALLOCATE> ASSET_ALLOCATE { get; set; }
+    }
+
+    public class ASSET_ALLOCATE {
+        public string ASSET_TYPE_CODE { get; set; }
+        public string ASSET_TYPE_TH   { get; set; }
+        public string ASSET_TYPE_EN { get; set; }
+        public double? ASSET_TYPE_PERCENTAGE { get; set; }
+    }
+    public class TOP5HOLDINGS
+    {
+        public string TOP5HOLDINGS_DATE { get; set; }
+        public string PORT_CODE { get; set; }
+        public List<ASSET_HOLDING> ASSET_HOLDING { get; set; }
+    }
+    public class ASSET_HOLDING
+    {
+        public string ASSET_CODE { get; set; }
+        public string ASSET_NAME_TH { get; set; }
+        public string ASSET_NAME_EN { get; set; }
+        public double? ASSET_PERCENTAGE { get; set; }
+        public string ASSET_CHANGE { get; set; }
     }
 }

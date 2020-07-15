@@ -12,9 +12,9 @@ using WebAPI01Application.Models;
 namespace WebAPI01Application.Controllers
 {
     //[AuthenticationFilter]
-
-    [RoutePrefix("api/FundPFxx")]
-    public class FundPFController : ApiController
+    //[RoutePrefix("api/FundPFTest")]
+    [RoutePrefix("api/FundPF")]
+    public class FundPFTestController : ApiController
     {
         // GET: api/NAV
         /* old
@@ -31,7 +31,7 @@ namespace WebAPI01Application.Controllers
         [Route("")]
         public ArrayList Get()
         {
-            FundPFPersistance fp = new FundPFPersistance();
+            FundPFPersistanceTest fp = new FundPFPersistanceTest();
             if (fp == null)
             {
                 throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.NotFound));
@@ -68,7 +68,7 @@ namespace WebAPI01Application.Controllers
         [Route("{navDate}")]
         public ArrayList Get(string navDate)
         {
-            FundPFPersistance fp = new FundPFPersistance();
+            FundPFPersistanceTest fp = new FundPFPersistanceTest();
             if (fp == null)
             {
                 throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.NotFound));
