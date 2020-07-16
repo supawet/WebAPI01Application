@@ -142,12 +142,12 @@ namespace WebAPI01Application
                 */
                 CultureInfo culture = new CultureInfo("en-US");
                 //string format_from = "yyyy-MM-dd HH:mm:ss.fffffff";
-                string format_from = "yyyy-MM-dd HH:mm:ss.fff";
+                //string format_from = "yyyy-MM-dd HH:mm:ss.fff";
                 string format_to = "yyy-MM-dd";
 
                 //---------------------------------------------------
                 command.CommandType = CommandType.Text;
-                command.CommandText = "select actdate, port_code, dbo.fn_findAssetTypeCode(asset_type_en) as 'asset_type_code', asset_type_th, asset_type_en, asset_percentage from azure_tblbfapp_asset_alloc where actdate = (select MAX(actdate) from azure_tblbfapp_asset_alloc) and flag = 1 order by port_code , asset_percentage desc";
+                command.CommandText = "select actdate, port_code, dbo.fn_findAssetTypeCode(asset_type_en) as 'asset_type_code', asset_type_th, asset_type_en, CAST(CAST(CAST(asset_percentage/100 as DECIMAL(8,6)) as nvarchar) as float) as 'asset_percentage' from azure_tblbfapp_asset_alloc where actdate = (select MAX(actdate) from azure_tblbfapp_asset_alloc) and flag = 1 order by port_code , asset_percentage desc";
                 mySQLReader = command.ExecuteReader();
 
                 var aSSET_ALLOCATION = new List<ASSET_ALLOCATION>();
@@ -181,7 +181,10 @@ namespace WebAPI01Application
                 //---------------------------------------------------
                 //---------------------------------------------------
                 command.CommandType = CommandType.Text;
+                /*
                 command.CommandText = "select A.actdate, A.port_code, A.asset_code, A.asset_name_th, A.asset_name_en, A.asset_percentage, CASE WHEN A.asset_percentage-B.asset_percentage = 0 THEN '' WHEN A.asset_percentage-B.asset_percentage < 0 THEN '-' WHEN A.asset_percentage-B.asset_percentage > 0 THEN '+' ELSE 'NEW!' END as 'asset_change' from (select * from azure_Tblbfapp_top5 where actdate = (select MAX(actdate) from azure_Tblbfapp_top5) and flag = 1) as A LEFT JOIN (select * from azure_Tblbfapp_top5 where actdate = (SELECT MAX(actdate) FROM azure_Tblbfapp_top5 WHERE actdate<(SELECT MAX(actdate) FROM azure_Tblbfapp_top5 where flag = 1) and flag = 1) and flag = 1) as B ON A.port_code = B.port_code and A.asset_code = B.asset_code order by A.port_code , A.asset_percentage desc";
+                */
+                command.CommandText = "select actdate, port_code, asset_code, asset_name_th, asset_name_en, CAST(CAST(CAST(asset_percentage/100 as DECIMAL(8,6)) as nvarchar) as float) as 'asset_percentage' from azure_Tblbfapp_top5 where actdate = (select MAX(actdate) from azure_Tblbfapp_top5) and flag = 1 order by port_code , asset_percentage desc";
                 mySQLReader = command.ExecuteReader();
 
                 var tOP5HOLDINGS = new List<TOP5HOLDINGS>();
@@ -195,7 +198,7 @@ namespace WebAPI01Application
                     aSSET_HOLDING.ASSET_NAME_TH = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_name_th")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_name_th"));
                     aSSET_HOLDING.ASSET_NAME_EN = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_name_en")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_name_en"));
                     aSSET_HOLDING.ASSET_PERCENTAGE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_percentage")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("asset_percentage"));
-                    aSSET_HOLDING.ASSET_CHANGE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_change")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_change"));
+                    //aSSET_HOLDING.ASSET_CHANGE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_change")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_change"));
 
                     TOP5HOLDINGS tOP5HOLDINGS2 = tOP5HOLDINGS.FirstOrDefault(x => x.PORT_CODE.Equals(port_code, StringComparison.OrdinalIgnoreCase));
                     if (tOP5HOLDINGS2 != null)

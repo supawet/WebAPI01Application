@@ -120,6 +120,6 @@ namespace WebAPI01Application.Models
         public string ASSET_NAME_TH { get; set; }
         public string ASSET_NAME_EN { get; set; }
         public double? ASSET_PERCENTAGE { get; set; }
-        public string ASSET_CHANGE { get; set; }
+        //public string ASSET_CHANGE { get; set; }
     }
 }

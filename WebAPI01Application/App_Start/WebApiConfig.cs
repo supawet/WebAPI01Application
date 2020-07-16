@@ -18,7 +18,7 @@ namespace WebAPI01Application
             config.Routes.MapHttpRoute(
                 name: "FundPF",
                 routeTemplate: "api/FundPF/{id}",
-                defaults: new { controller = "FundPFTest", id = RouteParameter.Optional }//,
+                defaults: new { controller = "FundPF", id = RouteParameter.Optional }//,
                 //constraints: new { id="length(2)"}
             );
 

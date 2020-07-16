@@ -12,8 +12,7 @@ using WebAPI01Application.Models;
 namespace WebAPI01Application.Controllers
 {
     //[AuthenticationFilter]
-    //[RoutePrefix("api/FundPFTest")]
-    [RoutePrefix("api/FundPF")]
+    [RoutePrefix("api/FundPFTest")]
     public class FundPFTestController : ApiController
     {
         // GET: api/NAV

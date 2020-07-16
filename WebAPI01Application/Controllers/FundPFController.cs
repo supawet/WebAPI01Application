@@ -13,7 +13,7 @@ namespace WebAPI01Application.Controllers
 {
     //[AuthenticationFilter]
 
-    [RoutePrefix("api/FundPFxx")]
+    [RoutePrefix("api/FundPF")]
     public class FundPFController : ApiController
     {
         // GET: api/NAV

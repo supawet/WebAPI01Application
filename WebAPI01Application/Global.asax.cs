@@ -17,6 +17,7 @@ namespace WebAPI01Application
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             GlobalConfiguration.Configuration.MessageHandlers.Add(new APIKeyMessageHandler());
+            //GlobalConfiguration.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
         }
     }
 }
