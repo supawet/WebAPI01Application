@@ -9,7 +9,12 @@ namespace WebAPI01Application
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
+            // Web API configuration and services  
+            // Configure Web API to use only bearer token authentication.  
+            //config.SuppressDefaultHostAuthentication();
+            //config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
+
+            //config.EnableCors();
 
             // Web API routes
             config.MapHttpAttributeRoutes();
@@ -26,6 +31,23 @@ namespace WebAPI01Application
                 name: "FundPFTest",
                 routeTemplate: "api/FundPFTest/{id}",
                 defaults: new { controller = "FundPFTest", id = RouteParameter.Optional }//,
+                //constraints: new { id="length(2)"}
+            );
+
+            // fund fact sheet, monthly update route
+            config.Routes.MapHttpRoute(
+                name: "Book",
+                routeTemplate: "api/Book/{id}/{action}",
+                //routeTemplate: "api/Book/{id}/{action}/{subaction}",
+                defaults: new { controller = "Book", id = RouteParameter.Optional }//,
+                //defaults: new { controller = "Book", id = RouteParameter.Optional, subaction = RouteParameter.Optional }//,
+                //constraints: new { id="length(2)"}
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "ODD",
+                routeTemplate: "api/ODD/{id}/{action}/{subaction}",
+                defaults: new { controller = "ODD", id = RouteParameter.Optional, subaction = RouteParameter.Optional }//,
                 //constraints: new { id="length(2)"}
             );
             /*

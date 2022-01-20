@@ -143,8 +143,11 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="AuthenticationFilter.cs" />
+    <Compile Include="Controllers\BookController.cs" />
     <Compile Include="Controllers\FundPFTestController.cs" />
     <Compile Include="Controllers\FundPFController.cs" />
+    <Compile Include="FundBookPersistence.cs" />
+    <Compile Include="FundPFPersistence_backup.cs" />
     <Compile Include="FundPFPersistenceTest.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

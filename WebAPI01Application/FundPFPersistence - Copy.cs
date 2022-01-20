@@ -140,88 +140,13 @@ namespace WebAPI01Application
 
                 mySQLReader = cmd.ExecuteReader();
                 */
-                CultureInfo culture = new CultureInfo("en-US");
-                //string format_from = "yyyy-MM-dd HH:mm:ss.fffffff";
-                //string format_from = "yyyy-MM-dd HH:mm:ss.fff";
-                string format_to = "yyy-MM-dd";
-
-                //---------------------------------------------------
-                command.CommandType = CommandType.Text;
-                command.CommandText = "select actdate, port_code, dbo.fn_findAssetTypeCode(asset_type_en) as 'asset_type_code', asset_type_th, asset_type_en, CAST(CAST(CAST(asset_percentage/100 as DECIMAL(8,6)) as nvarchar) as float) as 'asset_percentage' from azure_tblbfapp_asset_alloc where actdate = (select MAX(actdate) from azure_tblbfapp_asset_alloc) and flag = 1 order by port_code , asset_percentage desc";
-                mySQLReader = command.ExecuteReader();
-
-                var aSSET_ALLOCATION = new List<ASSET_ALLOCATION>();
-                while (mySQLReader.Read())
-                {
-                    string actdate = mySQLReader.GetValue(mySQLReader.GetOrdinal("actdate")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("actdate")).ToString()).ToString(format_to, culture);
-                    string port_code = mySQLReader.GetValue(mySQLReader.GetOrdinal("port_code")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("port_code"));
-
-                    ASSET_ALLOCATE aSSET_ALLOCATE = new ASSET_ALLOCATE();
-                    aSSET_ALLOCATE.ASSET_TYPE_CODE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_type_code")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_type_code"));
-                    aSSET_ALLOCATE.ASSET_TYPE_TH = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_type_th")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_type_th"));
-                    aSSET_ALLOCATE.ASSET_TYPE_EN = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_type_en")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_type_en"));
-                    aSSET_ALLOCATE.ASSET_TYPE_PERCENTAGE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_percentage")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("asset_percentage"));
-
-                    ASSET_ALLOCATION aSSET_ALLOCATION2 = aSSET_ALLOCATION.FirstOrDefault(x => x.PORT_CODE.Equals(port_code, StringComparison.OrdinalIgnoreCase));
-                    if (aSSET_ALLOCATION2 != null)
-                    {
-                        aSSET_ALLOCATION2.ASSET_ALLOCATE.Add(aSSET_ALLOCATE);
-                        continue;
-                    }
-
-                    aSSET_ALLOCATION2 = new ASSET_ALLOCATION
-                    {
-                        ASSET_ALLOCATION_DATE = actdate,
-                        PORT_CODE = port_code,
-                        ASSET_ALLOCATE = new List<ASSET_ALLOCATE> { aSSET_ALLOCATE }
-                    };
-                    aSSET_ALLOCATION.Add(aSSET_ALLOCATION2);
-                }
-                mySQLReader.Close();
-                //---------------------------------------------------
-                //---------------------------------------------------
-                command.CommandType = CommandType.Text;
-                /*
-                command.CommandText = "select A.actdate, A.port_code, A.asset_code, A.asset_name_th, A.asset_name_en, A.asset_percentage, CASE WHEN A.asset_percentage-B.asset_percentage = 0 THEN '' WHEN A.asset_percentage-B.asset_percentage < 0 THEN '-' WHEN A.asset_percentage-B.asset_percentage > 0 THEN '+' ELSE 'NEW!' END as 'asset_change' from (select * from azure_Tblbfapp_top5 where actdate = (select MAX(actdate) from azure_Tblbfapp_top5) and flag = 1) as A LEFT JOIN (select * from azure_Tblbfapp_top5 where actdate = (SELECT MAX(actdate) FROM azure_Tblbfapp_top5 WHERE actdate<(SELECT MAX(actdate) FROM azure_Tblbfapp_top5 where flag = 1) and flag = 1) and flag = 1) as B ON A.port_code = B.port_code and A.asset_code = B.asset_code order by A.port_code , A.asset_percentage desc";
-                */
-                command.CommandText = "select actdate, port_code, asset_code, asset_name_th, asset_name_en, CAST(CAST(CAST(asset_percentage/100 as DECIMAL(8,6)) as nvarchar) as float) as 'asset_percentage' from azure_Tblbfapp_top5 where actdate = (select MAX(actdate) from azure_Tblbfapp_top5) and flag = 1 order by port_code , asset_percentage desc";
-                mySQLReader = command.ExecuteReader();
-
-                var tOP5HOLDINGS = new List<TOP5HOLDINGS>();
-                while (mySQLReader.Read())
-                {
-                    string actdate = mySQLReader.GetValue(mySQLReader.GetOrdinal("actdate")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("actdate")).ToString()).ToString(format_to, culture);
-                    string port_code = mySQLReader.GetValue(mySQLReader.GetOrdinal("port_code")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("port_code"));
-
-                    ASSET_HOLDING aSSET_HOLDING = new ASSET_HOLDING();
-                    aSSET_HOLDING.ASSET_CODE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_code")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_code"));
-                    aSSET_HOLDING.ASSET_NAME_TH = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_name_th")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_name_th"));
-                    aSSET_HOLDING.ASSET_NAME_EN = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_name_en")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_name_en"));
-                    aSSET_HOLDING.ASSET_PERCENTAGE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_percentage")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("asset_percentage"));
-                    //aSSET_HOLDING.ASSET_CHANGE = mySQLReader.GetValue(mySQLReader.GetOrdinal("asset_change")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("asset_change"));
-
-                    TOP5HOLDINGS tOP5HOLDINGS2 = tOP5HOLDINGS.FirstOrDefault(x => x.PORT_CODE.Equals(port_code, StringComparison.OrdinalIgnoreCase));
-                    if (tOP5HOLDINGS2 != null)
-                    {
-                        tOP5HOLDINGS2.ASSET_HOLDING.Add(aSSET_HOLDING);
-                        continue;
-                    }
-
-                    tOP5HOLDINGS2 = new TOP5HOLDINGS
-                    {
-                        TOP5HOLDINGS_DATE = actdate,
-                        PORT_CODE = port_code,
-                        ASSET_HOLDING = new List<ASSET_HOLDING> { aSSET_HOLDING }
-                    };
-                    tOP5HOLDINGS.Add(tOP5HOLDINGS2);
-                }
-                mySQLReader.Close();
-                //---------------------------------------------------
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = "SP_FundPF";
                 command.Parameters.Clear();
                 command.Parameters.AddWithValue("@dt", dt);
                 mySQLReader = command.ExecuteReader();
+
+                //CultureInfo culture = new CultureInfo(cultureName);
 
                 while (mySQLReader.Read())
                 {
@@ -238,7 +163,7 @@ namespace WebAPI01Application
                     fpf.AUM = mySQLReader.GetValue(mySQLReader.GetOrdinal("AUM")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("AUM"));
                     fpf.NAV = mySQLReader.GetValue(mySQLReader.GetOrdinal("NAV")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("NAV"));
                     fpf.DIVIDEND = mySQLReader.GetValue(mySQLReader.GetOrdinal("DIVIDEND")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("DIVIDEND"));
-                    fpf.DIVIDEND_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("DIVIDEND DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("DIVIDEND DATE")).ToString()).ToString(format_to, culture);
+                    fpf.DIVIDEND_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("DIVIDEND DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("DIVIDEND DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
                     fpf.PRICE = mySQLReader.GetValue(mySQLReader.GetOrdinal("PRICE")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("PRICE"));
                     fpf.REDEMPTION_PRICE = mySQLReader.GetValue(mySQLReader.GetOrdinal("REDEMPTION PRICE")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("REDEMPTION PRICE"));
                     //fpf.MINIMUM_FIRST_ORDER = mySQLReader.GetValue(mySQLReader.GetOrdinal("MINIMUM FIRST ORDER")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("MINIMUM FIRST ORDER"));
@@ -246,8 +171,8 @@ namespace WebAPI01Application
                     //fpf.MINIMUM_NEXT_ORDER = mySQLReader.GetValue(mySQLReader.GetOrdinal("MINIMUM NEXT ORDER")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("MINIMUM NEXT ORDER"));
                     fpf.MINIMUM_NEXT_ORDER = mySQLReader.GetValue(mySQLReader.GetOrdinal("MINIMUM NEXT ORDER")).Equals(DBNull.Value) ? 0 : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("MINIMUM NEXT ORDER"));
                     fpf.MANAGEMENT_FEE = mySQLReader.GetValue(mySQLReader.GetOrdinal("MANAGEMENT FEE")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("MANAGEMENT FEE"));
-                    //fpf.INCEPTION_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).Equals(DBNull.Value) ? null : DateTime.ParseExact(mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).ToString(), format_from, culture).ToString(format_to,culture);
-                    fpf.INCEPTION_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).ToString()).ToString(format_to, culture);
+                    fpf.INCEPTION_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("INCEPTION DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    //fpf.INCEPTION_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetValue(mySQLReader.GetOrdinal("INCEPTION DATE")).ToString();
                     fpf.RISK = mySQLReader.GetValue(mySQLReader.GetOrdinal("RISK")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RISK"));
                     fpf.RETURN_1D = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1D")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RETURN_1D"));
                     fpf.RETURN_1M = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1M")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RETURN_1M"));
@@ -272,16 +197,16 @@ namespace WebAPI01Application
                     fpf.BENCHMARK_3Y = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK 3Y")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("BENCHMARK 3Y"));
                     fpf.BENCHMARK_5Y = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK 5Y")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("BENCHMARK 5Y"));
                     fpf.BENCHMARK_NAME = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK NAME")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("BENCHMARK NAME")).Equals(DBNull.Value) ? "" : mySQLReader.GetString(mySQLReader.GetOrdinal("BENCHMARK NAME"));
-                    fpf.RETURN_1D_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1D_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1D_DATE")).ToString()).ToString(format_to, culture);
-                    fpf.RETURN_1M_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1M_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1M_DATE")).ToString()).ToString(format_to, culture);
-                    fpf.RETURN_3M_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_3M_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_3M_DATE")).ToString()).ToString(format_to, culture);
-                    fpf.RETURN_6M_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_6M_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_6M_DATE")).ToString()).ToString(format_to, culture);
-                    fpf.RETURN_YTD_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_YTD_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_YTD_DATE")).ToString()).ToString(format_to, culture);
-                    fpf.RETURN_1Y_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1Y_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1Y_DATE")).ToString()).ToString(format_to, culture); ;
-                    fpf.RETURN_3Y_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_3Y_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_3Y_DATE")).ToString()).ToString(format_to, culture);
-                    fpf.RETURN_5Y_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_5Y_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_5Y_DATE")).ToString()).ToString(format_to, culture);
+                    fpf.RETURN_1D_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1D_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_1D_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    fpf.RETURN_1M_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1M_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_1M_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    fpf.RETURN_3M_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_3M_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_3M_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    fpf.RETURN_6M_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_6M_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_6M_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    fpf.RETURN_YTD_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_YTD_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_YTD_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    fpf.RETURN_1Y_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_1Y_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_1Y_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    fpf.RETURN_3Y_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_3Y_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_3Y_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
+                    fpf.RETURN_5Y_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_5Y_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_5Y_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
                     fpf.RETURN_INC = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_INC")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("RETURN_INC"));
-                    fpf.RETURN_INC_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_INC_DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_INC_DATE")).ToString()).ToString(format_to, culture);
+                    fpf.RETURN_INC_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("RETURN_INC_DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("RETURN_INC_DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
                     fpf.SD_INC = mySQLReader.GetValue(mySQLReader.GetOrdinal("SD_INC")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("SD_INC"));
                     fpf.BENCHMARK_SD_1D = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK_SD_1D")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("BENCHMARK_SD_1D"));
                     fpf.BENCHMARK_SD_1M = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK_SD_1M")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("BENCHMARK_SD_1M"));
@@ -310,16 +235,9 @@ namespace WebAPI01Application
                     fpf.BENCHMARK_SD2_3Y = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK_SD2_3Y")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("BENCHMARK_SD2_3Y"));
                     fpf.BENCHMARK_SD2_5Y = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK_SD2_5Y")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("BENCHMARK_SD2_5Y"));
                     fpf.BENCHMARK_SD2_INC = mySQLReader.GetValue(mySQLReader.GetOrdinal("BENCHMARK_SD2_INC")).Equals(DBNull.Value) ? null : (double?)mySQLReader.GetDouble(mySQLReader.GetOrdinal("BENCHMARK_SD2_INC"));
-                    fpf.NAV_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("NAV DATE")).Equals(DBNull.Value) ? null : Convert.ToDateTime(mySQLReader.GetValue(mySQLReader.GetOrdinal("NAV DATE")).ToString()).ToString(format_to, culture);
+                    fpf.NAV_DATE = mySQLReader.GetValue(mySQLReader.GetOrdinal("NAV DATE")).Equals(DBNull.Value) ? null : mySQLReader.GetDateTime(mySQLReader.GetOrdinal("NAV DATE")).ToString("yyy-MM-dd", CultureInfo.CreateSpecificCulture("en-US"));
                     fpf.Fund_Fact_Sheet = mySQLReader.GetValue(mySQLReader.GetOrdinal("Fund_Fact_Sheet")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("Fund_Fact_Sheet"));
                     fpf.Monthly_Fund_Update = mySQLReader.GetValue(mySQLReader.GetOrdinal("Monthly_Fund_Update")).Equals(DBNull.Value) ? null : mySQLReader.GetString(mySQLReader.GetOrdinal("Monthly_Fund_Update"));
-
-                    ASSET_ALLOCATION aSSET_ALLOCATION2 = aSSET_ALLOCATION.FirstOrDefault(x => x.PORT_CODE.Equals(fpf.PORT_CODE, StringComparison.OrdinalIgnoreCase));
-                    fpf.ASSET_ALLOCATION = aSSET_ALLOCATION2;
-
-                    TOP5HOLDINGS tOP5HOLDINGS2 = tOP5HOLDINGS.FirstOrDefault(x => x.PORT_CODE.Equals(fpf.PORT_CODE, StringComparison.OrdinalIgnoreCase));
-                    fpf.TOP5HOLDINGS = tOP5HOLDINGS2;
-
                     fundPFArray.Add(fpf);
                 }
                 mySQLReader.Close();
